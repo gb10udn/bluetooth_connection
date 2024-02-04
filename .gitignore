@@ -1,4 +1,5 @@
 misc/
 .venv/
+__pycache__/
 config.ini
 *.cmd
