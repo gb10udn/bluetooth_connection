@@ -2,9 +2,8 @@ import subprocess
 import configparser
 import questionary
 
-# subprocess.Popen("ping")
 
-def connect(device_name: str):
+def connect(device_name: str):    # TODO: 240204 HFP にも対応する。
     """
     A2DP で bluetooth 接続する関数。
     """
@@ -12,7 +11,7 @@ def connect(device_name: str):
     subprocess.run(cmd)
 
 
-def disconnect(device_name: str):
+def disconnect(device_name: str):  # TODO: 240204 HFP にも対応する。
     """
     A2DP で bluetooth 切断する関数。
     """
@@ -20,13 +19,13 @@ def disconnect(device_name: str):
     subprocess.run(cmd)
 
 
-def read_device_name_from_config(*, path='config.ini') -> str:
+def read_device_name_from_config(*, path='config.ini') -> str | None:
     """
-    コンフィグファイルから
+    コンフィグファイルから、対象のデバイス名を取得する関数。
     """
     try:
         config_ini = configparser.ConfigParser()
-        config_ini.read(path, encoding='utf-8')  # FIXME: 240129 コンフィグのパスがない場合のハンドリングを記述する。(他にも参照している箇所があった気がする。)
+        config_ini.read(path, encoding='utf-8')
         return config_ini['GENERAL']['device_name']
     
     except:
@@ -38,3 +37,15 @@ if __name__ == '__main__':
         'Select bluetooth action',
         choices=['connect', 'disconnect'],  # TODO: 240204 現状のステータスを呼べるようにしてもいいかも？
     ).ask()
+
+    device_name = read_device_name_from_config()
+    if device_name is not None:
+        if action == 'connect':
+            connect(device_name)  # FIXME: 240204 失敗時の処理を書いてもいいかも？
+        elif action == 'disconnect':
+            disconnect(device_name)  # FIXME: 240204 失敗時の処理を書いてもいいかも？
+        else:
+            raise Exception('InternalError:')
+    
+    else:
+        raise Exception('Failure: cannot obtain "device name" from "config.ini" ...')
